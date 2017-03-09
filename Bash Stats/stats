@@ -1,0 +1,188 @@
+#!/bin/bash
+#
+# Filename: stats
+# Author: Johannes Pikel
+# ONID: pikelj
+# Date: 2016.01.07
+# Class: CS344-400
+# Assignment: Program 1
+# Description: a script file that accepts either a file or stdin 
+# a sequence of numbers.  It will calculate the average and median 
+# of the rows or columns (tab-delimited) and show them on screen.
+# The use of this file is as follows:
+# ./stats {-rows|-cols} [file]
+# References:
+# The examples given on the assignment page were very helpful for reference
+# I used several internet references
+# https://tiswww.case.edu/php/chet/bash/bashref.html
+# https://www.gnu.org/software/bash/manual/
+# http://ss64.com/osx/trap.html
+# http://stackoverflow.com/questions/20572934/get-the-name-of-the-caller-script-in-bash-script
+############################################
+
+#capture the command line arguments passed to this script for use in the trap
+readonly vars="$*"
+#Declare constant so we may use it in various functions
+#each tempfile will have the PID appended to it for clarity and 
+#to make sure simultaneaous runs do not overwite the files
+#variable to store the file path to the input_file or to temporarily store
+#the output from cat
+readonly DATAPATH=${2:-"datafile_$$"}
+
+############################################
+#Function: main()
+#Parameters: "$@"
+#Description: calculate average and median of
+#rows or columns of a given file or cat.
+############################################
+
+function main() {
+#trap to catch any common line errors and display them as well as abort signal
+trap 'write_error "$0 error at $LINENO"' ERR SIGABRT
+#create a trap to check for interrupt, teriminate, or hangup
+trap 'write_error "$(ps -o comm=,ppid= $PPID): line ${BASH_LINENO[1]}: $$ Terminated \
+    $0 $vars $DATAPATH"' INT HUP TERM
+
+#check if we were passed the correct number of arguments namely 1 or 2
+#if we did not receive -r* or -c* then first argument is incorrect
+#If anything is incorrect we write error message 
+    if [ "$#" -lt "1" ] || [ "$#" -gt "2" ] || ! [[ $1 == -r* ]] && ! [[ $1 == -c* ]]; then
+        write_error "$0: {-rows|-cols} [file]"
+    fi
+
+#test if we only passed 1 variable, in that case we need to populate file from stdin
+
+    test "$#" == "1" && cat > "$DATAPATH"
+
+#check if file is empty now, before we load the file
+#also check if the file is readable if it is not empty
+#if either write an appropriate message to write_error
+    test ! -r "$DATAPATH" && write_error "$0 $DATAPATH cannot be read."
+    test ! -s "$DATAPATH" && write_error "$0 $DATAPATH is empty."
+
+#If we get here all out tests passed. Check if we are to calculate for rows or columns
+#if rows we'll convert the file then print those rows
+#similarly if argument 1 does not equate to -rows then we'll evaluate the columns
+#the make_rows and make_cols function are piped to a sort function
+#which in turn is piped to the do_math to find the averages and medians
+#if the [[ ]] doesn't evaluate to -r* we know that it must be -c because we've already
+#checked for valid input above
+
+    if [[ "$1" = -r* ]]; then
+        make_rows
+    else
+        make_cols
+    fi
+
+#clean_up remaining files and exit successuflly
+    clean_up
+    exit 0
+}
+
+#########################################
+#Function: make_rows()
+#Description: reads each line from the file
+#removes any extra spaces and replaces them with newline.
+#sends this column of numbers to sort_line()
+#sort_line then pipes to do_math that prints 2 tab delimited integers
+#the average and median, so as we receive those back print them to
+#stdin and add a newline
+#########################################
+
+function make_rows() {
+    printf "Average\tMedian\n"
+    while read myLine; do
+        printf "$(echo $myLine | tr -s ' ' $'\n' | sort_line)\n"
+    done < "$DATAPATH"
+}
+
+#########################################
+#Function: make_cols()
+#Description: Starting from the first column to the last column
+#Removes all extra spaces and replaces them with tabs, 
+#takes the current column with cut and sends it to sort_line() 
+#sort_line pipes to do_math that prints 2 tab delimited integers
+#we'll put these in two arrays avg and med, for averages and medians
+#with the read redirection from the pipe of commands 
+#then we'll print the titles and the contents of each array while 
+#replacing spaces with tabs to get our formating
+#########################################
+function make_cols() {
+    read columns _ <<< $(head -1 "$DATAPATH" | wc -w)
+    for idx in `eval echo {1..$columns}`; do
+        read avg[$idx] med[$idx] < <(cat "$DATAPATH" | tr -s ' ' $'\t' |\
+                                         cut -f $idx | sort_line)
+    done
+    printf "Averages:\n$(printf "${avg[*]}" | tr ' ' $'\t')\n"
+    printf "Medians:\n$(printf "${med[*]}" | tr ' ' $'\t')\n"
+}
+
+#########################################
+#Function: sort_line()
+#Description: when passed a column of numbers from a pipe
+# sorts that column, removes newline and replaces with + sign
+# appends that sorted line to TEMPFILE
+# also appends a newline to TEMPFILE
+# in preparation for the do_math()
+# this way rows or columns are now in ascended sorted order on their
+# own lines
+#########################################
+function sort_line() {
+    sort -n | tr $'\n' '+' | do_math
+}
+
+#########################################
+#Function: do_math()
+#Description: read the line passed from stdin
+# gets the number of integers in the line and stores that in count
+# need to remove the pluses we added though, to get an accurate number of
+# integers. 
+# Then since each line is prepared for addition with a trailing + sign. 
+# expand the expression with $((...)) so that our final equation is:
+#   ( num1 + num2 + ... + num_n + ( count / 2 ) ) / count
+#
+# Then cut the sorted line at the appropriate field with count/2 + 1 to find
+# the median.  Need to once again remove the + signes and replace with tabs in this
+# case so we cut at the correct field.
+# Will print the average and median as tab separated and that will be caught by 
+# either the make_rows or make_cols functions above.
+#preconditions: line passed from stdin with + signs between integers and trailing
+#########################################
+function do_math() {
+    read line
+    count=$(echo $line | tr '+' ' ' | wc -w)
+    printf "$((($line($count/2))/$count))\t$(echo $line |\
+             tr -s '+' $'\t' | cut -f $(($count/2 + 1)) )"
+}
+
+#########################################
+#Function: Clean_up()
+#Parameters: none
+#Description: removes the files we know we created
+#with the -f tag force removal or ignore if it doesn't 
+#exist.  Since an actual file passed in is contained in
+# $DATAPATH we want to make sure we only remove $DATAPATH
+# if it a file that we created with stdin and not a pre-existing file.
+# If our test fails we want to return a 0 so we don't falsely trigger
+# the trap set with ERR.
+#########################################
+
+function clean_up() {
+    [ "$DATAPATH" == "datafile_$$" ] && rm -f $DATAPATH || return 0
+}
+
+
+#########################################
+#Function: write_error
+#Description: clean up the files if any. then write
+# to stderr the message passed as a single argument
+# exit with a status of 1
+#########################################
+
+function write_error() {
+    clean_up; echo "$1" 1>&2; exit 1
+}
+
+
+#run main with command line arguments
+    main "$@"

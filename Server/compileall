@@ -1,0 +1,27 @@
+#!/bin/bash
+#
+# Filename: compileall
+# Author: Johannes Pikel
+# ONID: pikelj
+# Date: 2017.03.01
+# Class: CS344-400
+# Assignment: Program 3 OTP
+# Description: a bash script file that will compile the 5 programs that are
+# a part of the OTP program 3.
+# otp_enc_d is the encryption server
+# otp_enc is the encryption client
+# otp_dec_d is the decryption server
+# otp_dec is the decryption client
+# keygen is the one time pad key generation tool
+#########################################
+
+echo "compiling keygen"
+gcc -x c -g -Wall -pedantic-errors keygen.c -o keygen
+echo "compiling otp_enc_d"
+gcc -x c -g -Wall -pedantic-errors otp_enc_d.c -o otp_enc_d
+echo "compiling otp_enc"
+gcc -x c -g -Wall -pedantic-errors otp_enc.c -o otp_enc
+echo "compiling otp_dec_d"
+gcc -x c -g -Wall -pedantic-errors otp_dec_d.c -o otp_dec_d
+echo "compiling otp_dec"
+gcc -x c -g -Wall -pedantic-errors otp_dec.c -o otp_dec

@@ -1,0 +1,86 @@
+Algorithm changedp
+[1, 1, 1, 1]
+4
+[0, 1, 2, 1]
+4
+[0, 0, 1, 2]
+3
+Algorithm changegreedy
+[1, 1, 1, 1]
+4
+[2, 1, 0, 2]
+5
+[0, 0, 1, 2]
+3
+Algorithm changedp
+[1, 1, 1, 1]
+4
+[0, 1, 2, 1]
+4
+[0, 0, 1, 2]
+3
+Algorithm changegreedy
+[1, 1, 1, 1]
+4
+[2, 1, 0, 2]
+5
+[0, 0, 1, 2]
+3
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+Algorithm changeslow
+[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+4
+Algorithm changeslow
+[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+4
+Algorithm changeslow
+[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+4
+Algorithm changeslow
+[1, 1, 1, 1]
+4

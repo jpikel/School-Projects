@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# Filename: compileall
+# Author: Johannes Pikel
+# ONID: pikelj
+# Date: 2017.03.01
+# Class: CS344-400
+# Assignment: Program 3 OTP
+# Description: a bash script file that will compile the smallsh
+
+
+gcc -x c -g -Wall -pedantic-errors pikelj.smallsh.c -o smallsh
