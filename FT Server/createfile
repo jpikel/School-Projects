@@ -1,0 +1,7 @@
+#!/bin/bash
+
+
+for i in {1..5000}; do
+    cat alice.txt >> alice_big.txt;
+done
+
